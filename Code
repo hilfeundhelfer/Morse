@@ -1,0 +1,383 @@
+/* Mark Heuser
+ *  
+ * Dieses Programm übersetzt eingegebene Wörter und Sätze in Morsecode.
+ * Außerdem wird die Eingabe in Echtzeit auf einem Display dargestellt.
+ * 
+ * Gebe deinen Satz bei /////// Eingabe //////// ein. */
+ 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+
+#include <Wire.h>                                    // Einbindung der Bibliotheken
+#include <SPI.h>
+
+////////////////////////////////////////////////////////////////         OLED        ////////////////////////////////////////////////////////////////
+
+#include <Adafruit_GFX.h>                            // Einbindung der Bibliotheken für Display
+#include <Adafruit_SSD1306.h>
+
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+
+// Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+
+////////////////////////////////////////////////////////////////      OLED ENDE        //////////////////////////////////////////////////////////////
+
+                                                      // Festlegung der Integerwerte
+int LED = 18;                                         // PIN 18 = LED
+
+int Punkt_dit = 100;                                  // Länge eines Morse Punktes (Dit)
+int Strich_dah = Punkt_dit * 3;                       // Länge eines Morse Striches (Dah)
+int zwischenSymbol = Punkt_dit;                       // Die Pause zwischen zwei gesendeten Symbolen ist ein Dit lang
+int zwischenBuchstabe = Punkt_dit * 3;                // Zwischen Buchstaben in einem Wort wird eine Pause von der Länge eines Dah (oder drei Dits) eingeschoben
+int zwischenWort = Punkt_dit * 7;                     // Die Länge der Pause zwischen Wörtern entspricht sieben Dits
+
+void Pause(int PausenZeit);                           //Funktionsprototypen
+void Punkt();
+void Strich();
+void zu_Char(char tmpChar);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+
+void setup()
+{
+  Serial.begin(115200);
+  pinMode (LED, OUTPUT);                              // Konfiguriert PIN 18 (LED) als Output
+
+////////////////////////////////////////////////////////////////         OLED        ////////////////////////////////////////////////////////////////
+
+                                                      // Display festlegung
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) 
+  { 
+    Serial.println(F("SSD1306 allocation failed"));
+    for(;;);
+  } 
+  delay(2000);
+  display.clearDisplay();
+  display.setTextSize(2);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 0);
+}
+////////////////////////////////////////////////////////////////      OLED ENDE        //////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+
+char Eingabe[] = "hello";                               /////////////////////////////////////////   Eingabe   /////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+
+void loop()                                           // Loop zersetzt die Eingabe in die einzelenen Buchstaben und übersetzt diese in Morsecode
+{
+  for (int i = 0; i < sizeof(Eingabe) - 1; i++)       // Aufteilung der Eingabe in einzelne char
+  {
+    display.setCursor(i*11, 25);
+    char tmpChar = Eingabe[i];
+    tmpChar = toLowerCase(tmpChar);
+    zu_Char(tmpChar);
+  }
+                                                      // Pause bevor sich Code Wiederholt/ Display zeigt MORSECODER an.
+  display.clearDisplay();
+  delay(2000);                                        
+  display.setCursor(0, 25);
+  display.println("MORSECODER");
+  display.display();
+  delay(4000); 
+  display.clearDisplay();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+
+                                                      // Funktionen:
+void Pause(int PausenZeit)                            // Übersetzung Pause, Punkt, Strich in Befehle für LED  
+{
+  digitalWrite(LED, LOW); 
+  delay(PausenZeit);  
+}
+void Punkt()                                                                   
+{
+  digitalWrite(LED, HIGH);
+  delay(Punkt_dit);
+}
+void Strich()
+{
+  digitalWrite(LED, HIGH);
+  delay(Strich_dah);
+}
+void zu_Char(char tmpChar)                            // Überstzung des Alphabets und Leerstellen in Morsecode
+{
+  switch (tmpChar)                                    
+  {
+    case 'a':
+      display.println("a");
+      display.display();  
+      Punkt();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'b':
+      display.println("b");
+      display.display();
+      Strich();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'c':
+      display.println("c");
+      display.display();
+      Strich();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'd':
+      display.println("d");
+      display.display();
+      Strich();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'e':
+      display.println("e");
+      display.display();
+      Punkt();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'f':
+      display.println("f");
+      display.display();
+      Punkt();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'g':
+      display.println("g");
+      display.display();
+      Strich();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'h':
+      display.println("h");
+      display.display();
+      Punkt();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'i':
+      display.println("i");
+      display.display();
+      Punkt();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'j':
+      display.println("j");
+      display.display();
+      Punkt();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'k':
+      display.println("k");
+      display.display();
+      Strich();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'l':
+      display.println("l");
+      display.display();
+      Punkt();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'm':
+      display.println("m");
+      display.display();
+      Strich();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'n':
+      display.println("n");
+      display.display();
+      Strich();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'o':
+      display.println("o");
+      display.display();
+      Strich();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'p':
+      display.println("p");
+      display.display();
+      Punkt();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'q':
+      display.println("q");
+      display.display();
+      Strich();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'r':
+      display.println("r");
+      display.display();
+      Punkt();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenBuchstabe);
+    break;
+    case 's':
+      display.println("s");
+      display.display();
+      Punkt();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenBuchstabe);
+    break;
+    case 't':
+      display.println("t");
+      display.display();
+      Strich();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'u':
+      display.println("u");
+      display.display();
+      Punkt();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'v':
+      display.println("v");
+      display.display();
+      Punkt();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'w':
+      display.println("w");
+      display.display(); 
+      Punkt();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'x':
+      display.println("x");
+      display.display();
+      Strich();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'y':
+      display.println("y");
+      display.display();
+      Strich();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenBuchstabe);
+    break;
+    case 'z':
+      display.println("z");
+      display.display();
+      Strich();
+      Pause(zwischenSymbol);
+      Strich();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenSymbol);
+      Punkt();
+      Pause(zwischenBuchstabe);
+    break;
+    default:
+      display.println(" ");
+      display.display(); 
+      Pause(zwischenBuchstabe);      
+  }
+}
